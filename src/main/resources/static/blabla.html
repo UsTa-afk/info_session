@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Info Session - Masa Eşleştirme</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-900 text-slate-100 min-h-screen flex items-center justify-center p-4">
+
+    <div class="w-full max-w-md bg-slate-800 rounded-2xl shadow-xl border border-slate-700 p-6 space-y-6">
+        
+        <header class="text-center">
+            <h1 class="text-2xl font-bold tracking-tight text-white">Info Session</h1>
+            <p class="text-slate-400 text-sm mt-1">Tanışma & Masa Eşleştirme Formu</p>
+        </header>
+
+        <div id="formSection" class="space-y-4">
+            <div>
+                <label class="block text-sm font-medium mb-1">Adın Soyadın</label>
+                <input id="userName" type="text" placeholder="Örn: Mehmet" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-indigo-500">
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium mb-1">En çok hangi alana ilgi duyuyorsun?</label>
+                <select id="q1" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-indigo-500">
+                    <option value="web">Web Geliştirme</option>
+                    <option value="mobile">Mobil Geliştirme</option>
+                    <option value="ai">Yapay Zekâ & Veri</option>
+                    <option value="game">Oyun Geliştirme</option>
+                </select>
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium mb-1">Sohbet başlatma tarzın (1: Dinleyiciyim, 5: Başlatırım)</label>
+                <select id="q2" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-indigo-500">
+                    <option value="1">1 - Genelde dinlemeyi tercih ederim</option>
+                    <option value="2">2 - Sakinim ama katılırım</option>
+                    <option value="3">3 - Dengeli</option>
+                    <option value="4">4 - Kolayca konu açarım</option>
+                    <option value="5">5 - Ortamı ben başlatır ve yönetirim</option>
+                </select>
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium mb-1">Yazılım deneyim seviyen</label>
+                <select id="q3" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-indigo-500">
+                    <option value="1">1 - Sıfırdan başladım / Meraklıyım</option>
+                    <option value="2">2 - Temel kavramları biliyorum</option>
+                    <option value="3">3 - Kendi projelerimi yapıyorum</option>
+                    <option value="4">4 - İleri seviye / Deneyimli</option>
+                    <option value="5">5 - Sektörde tecrübeliyim</option>
+                </select>
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium mb-1">Hangi konu üzerine muhabbet sarsın?</label>
+                <select id="q4" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-indigo-500">
+                    <option value="gaming">Oyun Dünyası & Geek Kültürü</option>
+                    <option value="cinema">Dizi, Film & Kültür Sanat</option>
+                    <option value="startup">Girişimcilik & Proje Fikirleri</option>
+                </select>
+            </div>
+
+            <button onclick="handleSubmit()" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-medium py-2.5 rounded-lg transition-colors">
+                Yanıtları Gönder
+            </button>
+        </div>
+
+        <div id="waitingSection" class="hidden text-center space-y-4 py-8">
+            <div class="inline-block animate-spin rounded-full h-10 w-10 border-4 border-indigo-500 border-t-transparent"></div>
+            <h2 class="text-lg font-semibold text-white">Cevapların Alındı!</h2>
+            <p class="text-sm text-slate-400">Masalar belirlenirken lütfen bekle... Organizatör dağıtımı başlattığında masa numaran burada görünecektir.</p>
+            
+            <button onclick="triggerDistribution()" class="mt-4 text-xs bg-slate-700 hover:bg-slate-600 text-slate-300 py-1.5 px-3 rounded">
+                [Admin Test] Masaları Şimdi Dağıt
+            </button>
+        </div>
+
+        <div id="resultSection" class="hidden text-center space-y-4 py-6">
+            <div class="bg-indigo-950 border border-indigo-500/40 rounded-xl p-6">
+                <span class="text-xs uppercase tracking-wider text-indigo-400 font-semibold">Atandığın Masa</span>
+                <div id="tableNumberDisplay" class="text-5xl font-extrabold text-white my-3">--</div>
+                <p id="participantNameDisplay" class="text-slate-300 font-medium"></p>
+            </div>
+            <p class="text-xs text-slate-400">Numaralı masaya geçip ekip arkadaşlarınla tanışabilirsin!</p>
+        </div>
+
+    </div>
+
+    <script>
+        const API_URL = "http://localhost:8081/api";
+        let currentUserId = null;
+        let pollInterval = null;
+
+        async function handleSubmit() {
+            const name = document.getElementById("userName").value.trim();
+            if (!name) {
+                alert("Lütfen adınızı girin.");
+                return;
+            }
+
+            const payload = {
+                name: name,
+                answers: {
+                    q1: document.getElementById("q1").value,
+                    q2: document.getElementById("q2").value,
+                    q3: document.getElementById("q3").value,
+                    q4: document.getElementById("q4").value
+                }
+            };
+
+            try {
+                const response = await fetch(`${API_URL}/survey/submit`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(payload)
+                });
+
+                const data = await response.json();
+                currentUserId = data.userId;
+
+                document.getElementById("formSection").classList.add("hidden");
+                document.getElementById("waitingSection").classList.remove("hidden");
+
+                startPolling();
+            } catch (err) {
+                alert("Backend bağlantı hatası! Sunucunun 8081 portunda çalıştığından emin ol.");
+            }
+        }
+
+        function startPolling() {
+            pollInterval = setInterval(async () => {
+                if (!currentUserId) return;
+
+                try {
+                    const response = await fetch(`${API_URL}/user/status/${currentUserId}`);
+                    if (!response.ok) return;
+
+                    const user = await response.json();
+                    if (user.tableNumber !== null && user.tableNumber !== undefined) {
+                        clearInterval(pollInterval);
+                        showResult(user.name, user.tableNumber);
+                    }
+                } catch (err) {}
+            }, 2000);
+        }
+
+        function showResult(name, tableNumber) {
+            document.getElementById("waitingSection").classList.add("hidden");
+            document.getElementById("resultSection").classList.remove("hidden");
+            document.getElementById("participantNameDisplay").innerText = `Harika vakit geçir, ${name}!`;
+            document.getElementById("tableNumberDisplay").innerText = `Masa ${tableNumber}`;
+        }
+
+        async function triggerDistribution() {
+            try {
+                await fetch(`${API_URL}/admin/distribute`, { method: "POST" });
+            } catch (err) {
+                alert("Dağıtım tetiklenirken hata oluştu.");
+            }
+        }
+    </script>
+</body>
+</html>
