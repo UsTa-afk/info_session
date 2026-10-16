@@ -1,0 +1,22 @@
+
+/* Tüm sayfalarda ortak stiller. pages/ altındaki her sayfa bu dosyayı yükler. */
+
+/* Masaüstünde sayfayı telefon genişliğinde ortalar. */
+@media (min-width: 480px) {
+  html {
+    background: #dee8ff;
+  }
+  body {
+    max-width: 430px;
+    margin: 0 auto !important;
+    box-shadow: 0 0 24px rgba(17, 28, 45, 0.08);
+  }
+  body > header.fixed,
+  body .fixed.bottom-0 {
+    left: 50% !important;
+    right: auto !important;
+    width: 100% !important;
+    max-width: 430px;
+    transform: translateX(-50%);
+  }
+}

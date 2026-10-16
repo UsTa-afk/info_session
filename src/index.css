@@ -1,0 +1,99 @@
+@import "tailwindcss";
+
+/* Koyu mod: <html class="dark"> ile manuel/otomatik geçiş */
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+  --font-sans: "Nunito", ui-sans-serif, system-ui, sans-serif;
+  --color-brand-50: #f5f3ff;
+  --color-brand-100: #ede9fe;
+  --color-brand-500: #8b5cf6;
+  --color-brand-600: #7c3aed;
+  --color-brand-700: #6d28d9;
+  --color-pop: #ff7a45;
+  --color-mint: #2dd4bf;
+}
+
+html,
+body,
+#root {
+  min-height: 100dvh;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-sans);
+  color: #1e1b4b;
+  background:
+    radial-gradient(circle at 15% 10%, #fde68a88 0, transparent 40%),
+    radial-gradient(circle at 90% 20%, #c4b5fd99 0, transparent 45%),
+    radial-gradient(circle at 50% 100%, #99f6e488 0, transparent 50%),
+    #faf7ff;
+  background-attachment: fixed;
+  -webkit-tap-highlight-color: transparent;
+  overscroll-behavior-y: none;
+}
+
+html.dark body {
+  color: #f1f0ff;
+  background:
+    radial-gradient(circle at 15% 10%, #7c3aed44 0, transparent 45%),
+    radial-gradient(circle at 90% 25%, #ff7a4533 0, transparent 40%),
+    radial-gradient(circle at 50% 100%, #2dd4bf33 0, transparent 50%),
+    #12101f;
+  background-attachment: fixed;
+}
+
+/* Büyük dokunma alanı için ortak buton/kart yardımcıları */
+.btn-primary {
+  min-height: 56px;
+  border-radius: 9999px;
+  padding: 0 28px;
+  font-weight: 800;
+  font-size: 1.1rem;
+  color: white;
+  background: linear-gradient(135deg, #7c3aed, #d946ef 60%, #ff7a45);
+  box-shadow: 0 10px 24px -8px #7c3aed99;
+  transition: transform 0.15s, opacity 0.2s;
+}
+.btn-primary:active {
+  transform: scale(0.97);
+}
+.btn-primary:disabled {
+  opacity: 0.4;
+  box-shadow: none;
+}
+.btn-ghost {
+  min-height: 56px;
+  min-width: 56px;
+  border-radius: 9999px;
+  font-weight: 700;
+  background: #ffffffb3;
+  border: 2px solid #ddd6fe;
+}
+html.dark .btn-ghost {
+  background: #ffffff10;
+  border-color: #ffffff22;
+}
+
+.card {
+  border-radius: 28px;
+  background: #ffffffcc;
+  border: 2px solid #ede9fe;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 8px 24px -14px #4c1d9566;
+}
+html.dark .card {
+  background: #ffffff0d;
+  border-color: #ffffff1a;
+}
+
+.opt-selected {
+  border-color: #7c3aed !important;
+  background: linear-gradient(135deg, #ede9fe, #fae8ff) !important;
+  box-shadow: 0 8px 20px -10px #7c3aedaa;
+}
+html.dark .opt-selected {
+  background: linear-gradient(135deg, #7c3aed55, #d946ef33) !important;
+  border-color: #a78bfa !important;
+}
