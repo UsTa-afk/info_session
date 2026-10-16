@@ -9,3 +9,5 @@ dist
 *.env
 .vercel
 .env.local
+
+.vercel
